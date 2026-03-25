@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Face AI System</title>
+</head>
+<body>
+
+    <h1>Face AI System</h1>
+
+    <h2>Upload Image</h2>
+
+    <input type="file" id="imageInput">
+    <button onclick="sendImage()">Predict</button>
+
+    <h3 id="result"></h3>
+
+    <hr>
+
+    <h2>Live Webcam Detection</h2>
+    <img src="/video" width="600">
+
+    <script>
+        function sendImage() {
+            let file = document.getElementById("imageInput").files[0];
+
+            if (!file) {
+                document.getElementById("result").innerText = "Select an image first";
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("image", file);
+
+            fetch("/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("result").innerText = data.error;
+                    return;
+                }
+
+                document.getElementById("result").innerText =
+                    "Mask: " + data.mask +
+                    " | Emotion: " + data.emotion +
+                    " | Alert: " + data.alert +
+                    " | Latency: " + data.latency + "s";
+            });
+        }
+    </script>
+
+</body>
+</html>
